@@ -33,8 +33,9 @@ export class AuthService {
 		return await this.makeTokensAndPayload(user);
 	}
 
-	async logout(id: string): Promise<UserDocument> {
-		return await this.usersService.update(id, { refreshToken: null });
+	async logout(id: string): Promise<boolean> {
+		await this.usersService.updateRefreshToken(id);
+		return true;
 	}
 
 	async refresh(id: string, refreshToken: string) {
