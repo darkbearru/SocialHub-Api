@@ -3,9 +3,9 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { disconnect } from 'mongoose';
-import { LoginUserDto } from '../src/modules/auth/dto/login-user.dto';
+import { UserLoginDto } from '../src/modules/auth/dto/user-login.dto';
 import { TJwtResponse } from '../src/common/types/jwt.types';
-import { CreateUserDto } from '../src/modules/users/dto/create-user.dto';
+import { UserCreateDto } from '../src/modules/users/dto/user-create.dto';
 import {
 	USER_NAME_MIN_ERROR,
 	USER_NOT_EMAIL_ERROR,
@@ -15,12 +15,12 @@ import { MUST_BE_STRING_ERROR } from '../src/common/constants/common.constants';
 import { ResponseInterceptor } from '../src/common/interceptors/response.interceptor';
 import { AUTH_WRONG_PASSWORD_ERROR } from '../src/modules/auth/constants/auth.constants';
 
-export const testUser: LoginUserDto = {
+export const testUser: UserLoginDto = {
 	email: 'test@test.com',
 	password: '12345',
 };
 
-export const registerUser: CreateUserDto = {
+export const registerUser: UserCreateDto = {
 	name: 'test',
 	...testUser,
 };
@@ -163,10 +163,7 @@ describe('AppController (e2e)', () => {
 		return request(app.getHttpServer())
 			.get('/auth/logout')
 			.set('Authorization', `Bearer ${response.accessToken}`)
-			.expect(200)
-			.then(({ body }: request.Response) => {
-				console.log(body);
-			});
+			.expect(200);
 	});
 
 	it('/users (Delete): success', async () => {

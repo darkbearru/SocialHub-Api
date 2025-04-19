@@ -1,15 +1,19 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
-import { UserDocument, UserModel } from './model/users.model';
+import { UserDocument } from './model/users.model';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateUserDto } from './dto/create-user.dto';
+import { UserCreateDto } from './dto/user-create.dto';
 import {
+	USER_ADD_COMPANY_ERROR,
+	USER_DEL_COMPANIES_ERROR,
+	USER_DEL_COMPANY_ERROR,
 	USER_DELETE_ERROR,
 	USER_EXISTS_ERROR,
+	USER_MODEL,
 	USER_NOT_FOUND_ERROR,
 	USER_OLD_PASSWORD_ERROR,
 } from './constants/user.constants';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UserUpdateDto } from './dto/user-update.dto';
 import { compare, genSalt, hash } from 'bcryptjs';
 import { TJwtPayload } from '../../common/types/jwt.types';
 import { UserRole } from '../../common/types/user.types';
@@ -19,11 +23,11 @@ export class UsersService {
 	private readonly logger = new Logger(UsersService.name, { timestamp: true });
 
 	constructor(
-		@InjectModel(UserModel.name)
+		@InjectModel(USER_MODEL)
 		private readonly userModel: Model<UserDocument>,
 	) {}
 
-	async create(dto: CreateUserDto): Promise<UserDocument> {
+	async create(dto: UserCreateDto): Promise<UserDocument> {
 		if (await this.userModel.findOne({ email: dto.email })) {
 			throw new BadRequestException(USER_EXISTS_ERROR);
 		}
@@ -42,7 +46,7 @@ export class UsersService {
 		}
 	}
 
-	async update(id: string, dto: UpdateUserDto): Promise<UserDocument> {
+	async update(id: string, dto: UserUpdateDto): Promise<UserDocument> {
 		const user = await this.checkUserById(id);
 		if (!(await compare(dto.passwordOld, user.passwordHash))) {
 			throw new BadRequestException(USER_OLD_PASSWORD_ERROR);
@@ -65,28 +69,46 @@ export class UsersService {
 	}
 
 	async findById(id: string): Promise<UserDocument> {
-		return this.userModel.findById({ _id: id });
+		return this.userModel.findById({ _id: id }).exec();
+	}
+
+	async findManyByIds(ids: string[] | Types.ObjectId[]): Promise<UserDocument[]> {
+		return this.userModel.find({ _id: { $in: ids } }).exec();
 	}
 
 	async findByEmail(email: string): Promise<UserDocument> {
 		return this.userModel.findOne({ email });
 	}
 
-	async addCompany(userId: string, companyId: string): Promise<UserDocument> {
-		const user = await this.checkUserById(userId);
-		// const company = await this.findById(companyId);
-		const id = new Types.ObjectId(companyId);
-		if (user.companies.includes(id)) return user;
-		user.companies.push(id);
-		return await user.save();
+	async addCompany(userId: string, companyId: string) {
+		await this.checkUserById(userId);
+		try {
+			return this.userModel.updateOne({ _id: userId }, { $addToSet: { companies: companyId } });
+		} catch (e) {
+			this.logger.error(e);
+			throw new BadRequestException(USER_ADD_COMPANY_ERROR);
+		}
 	}
 
-	async removeCompany(userId: string, companyId: string): Promise<UserDocument> {
-		const user = await this.checkUserById(userId);
-		const id = new Types.ObjectId(companyId);
-		const idx = user.companies.findIndex((company) => company === id);
-		user.companies.splice(idx, 1);
-		return await user.save();
+	async removeCompany(companyId: string, userId?: string) {
+		if (!userId) {
+			try {
+				return this.userModel.updateMany(
+					{ companies: companyId },
+					{ $pull: { companies: companyId } },
+				);
+			} catch (e) {
+				this.logger.error(e);
+				throw new BadRequestException(USER_DEL_COMPANIES_ERROR);
+			}
+		}
+		await this.checkUserById(userId);
+		try {
+			return this.userModel.updateOne({ _id: userId }, { $pull: { companies: companyId } });
+		} catch (e) {
+			this.logger.error(e);
+			throw new BadRequestException(USER_DEL_COMPANY_ERROR);
+		}
 	}
 
 	async updateRefreshToken(

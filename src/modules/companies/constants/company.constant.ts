@@ -1,0 +1,13 @@
+export const COMPANY_NAME_MIN_ERROR = 'companyNameMinError';
+export const COMPANY_REGISTERED_MIN_ERROR = 'companyRegisteredMinError';
+export const COMPANY_REACH_LIMIT_ERROR = 'companyReachLimitError';
+export const COMPANY_EXISTS_ERROR = 'companyExistsError';
+export const COMPANY_OWNER_NOT_FOUND_ERROR = 'companyOwnerNotFoundError';
+export const COMPANY_ADD_ERROR = 'companyAddError';
+export const COMPANY_DELETE_ERROR = 'companyDeleteError';
+export const COMPANY_UPDATE_ERROR = 'companyUpdateError';
+export const COMPANY_REGISTERED_ALREADY_EXISTS_ERROR = 'companyRegisteredAlreadyExistsError';
+export const COMPANY_MEMBERS_LIST_ERROR = 'companyMembersListError';
+export const COMPANY_ADD_MEMBER_ERROR = 'companyAddMemberError';
+export const COMPANY_DEL_MEMBER_ERROR = 'companyDelMemberError';
+export const COMPANY_MODEL = 'Company';

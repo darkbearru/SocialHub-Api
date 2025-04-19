@@ -4,6 +4,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { getMongoConfig } from './configs/mongo.config';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { CompaniesModule } from './modules/companies/companies.module';
+import { SubscriptionModule } from './modules/subscription/subscription.module';
 
 @Module({
 	imports: [
@@ -15,6 +17,8 @@ import { AuthModule } from './modules/auth/auth.module';
 		ConfigModule.forRoot(),
 		UsersModule,
 		AuthModule,
+		CompaniesModule,
+		SubscriptionModule,
 	],
 	controllers: [],
 	providers: [],

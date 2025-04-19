@@ -11,8 +11,8 @@ import {
 	ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginUserDto } from './dto/login-user.dto';
-import { CreateUserDto } from '../users/dto/create-user.dto';
+import { UserLoginDto } from './dto/user-login.dto';
+import { UserCreateDto } from '../users/dto/user-create.dto';
 import { AccessTokenGuard } from '../../common/guards/accessToken.guards';
 import { RefreshTokenGuard } from '../../common/guards/refreshToken.guards';
 import { Request } from 'express';
@@ -24,13 +24,13 @@ export class AuthController {
 	@UsePipes(new ValidationPipe())
 	@Post('login')
 	@HttpCode(HttpStatus.OK)
-	async login(@Body() dto: LoginUserDto) {
+	async login(@Body() dto: UserLoginDto) {
 		return this.authService.login(dto);
 	}
 
 	@UsePipes(new ValidationPipe())
 	@Post('register')
-	async register(@Body() dto: CreateUserDto) {
+	async register(@Body() dto: UserCreateDto) {
 		return this.authService.register(dto);
 	}
 
