@@ -1,9 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { UserRole } from '../../../common/types/user.types';
-import { TUserSubscription } from '../../../common/types/subscription.types';
+import { TSubscription } from '../../subscription/subscription.types';
+import { COMPANY_MODEL } from '../../companies/constants/company.constant';
 
 export type UserDocument = HydratedDocument<UserModel>;
+
 @Schema({ timestamps: true, _id: true })
 export class UserModel {
 	@Prop({ required: true, unique: true })
@@ -21,13 +23,13 @@ export class UserModel {
 	@Prop({
 		type: Object,
 		default: {
-			plan: 'free',
+			plan: 'personal',
 			expiresAt: null,
 		},
 	})
-	subscription: TUserSubscription;
+	subscription: TSubscription;
 
-	@Prop({ type: [{ type: Types.ObjectId, ref: 'Company' }] })
+	@Prop({ type: [{ type: Types.ObjectId, ref: COMPANY_MODEL }], default: [] })
 	companies: Types.ObjectId[];
 
 	@Prop()

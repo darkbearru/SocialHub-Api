@@ -1,9 +1,11 @@
 import { UserRole } from './user.types';
+import { TSubscription } from '../../modules/subscription/subscription.types';
 
 export type TJwtPayload = {
 	id: string;
 	name: string;
 	role: UserRole[];
+	subscription: TSubscription;
 };
 
 export type JwtTokens = {

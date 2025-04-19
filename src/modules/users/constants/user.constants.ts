@@ -5,3 +5,7 @@ export const USER_DELETE_ERROR = 'userDeleteError';
 export const USER_NAME_MIN_ERROR = 'userNameMinError';
 export const USER_PASSWORD_MIN_ERROR = 'userPasswordMinError';
 export const USER_NOT_EMAIL_ERROR = 'userNotEmailError';
+export const USER_ADD_COMPANY_ERROR = 'userAddCompanyError';
+export const USER_DEL_COMPANY_ERROR = 'userDelCompanyError';
+export const USER_DEL_COMPANIES_ERROR = 'userDelCompaniesError';
+export const USER_MODEL = 'User';

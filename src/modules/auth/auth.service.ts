@@ -7,13 +7,13 @@ import {
 import { UsersService } from '../users/users.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { LoginUserDto } from './dto/login-user.dto';
+import { UserLoginDto } from './dto/user-login.dto';
 import { TJwtPayload, TJwtResponse } from '../../common/types/jwt.types';
 import { USER_NOT_FOUND_ERROR } from '../users/constants/user.constants';
 import { compare } from 'bcryptjs';
 import { AUTH_NO_ACCESS_ERROR, AUTH_WRONG_PASSWORD_ERROR } from './constants/auth.constants';
 import { UserDocument } from '../users/model/users.model';
-import { CreateUserDto } from '../users/dto/create-user.dto';
+import { UserCreateDto } from '../users/dto/user-create.dto';
 
 @Injectable()
 export class AuthService {
@@ -23,12 +23,12 @@ export class AuthService {
 		private readonly jwtService: JwtService,
 	) {}
 
-	async login({ email, password }: LoginUserDto) {
+	async login({ email, password }: UserLoginDto) {
 		const payload: TJwtPayload = await this.validateUser(email, password);
 		return await this.makeTokensAndPayload(payload);
 	}
 
-	async register(dto: CreateUserDto) {
+	async register(dto: UserCreateDto) {
 		const user = await this.usersService.create(dto);
 		return await this.makeTokensAndPayload(user);
 	}
@@ -62,8 +62,8 @@ export class AuthService {
 	}
 
 	private makePayload(user: UserDocument): TJwtPayload {
-		const { id, name, role } = user;
-		return { id, name, role };
+		const { id, name, role, subscription } = user;
+		return { id, name, role, subscription };
 	}
 
 	private async validateUser(email: string, password: string): Promise<TJwtPayload> {
@@ -75,7 +75,7 @@ export class AuthService {
 		if (!isCorrectPassword) {
 			throw new UnauthorizedException(AUTH_WRONG_PASSWORD_ERROR);
 		}
-		return { id: user.id, name: user.name, role: user.role };
+		return { id: user.id, name: user.name, role: user.role, subscription: user.subscription };
 	}
 
 	private async getTokens(payload: TJwtPayload) {
